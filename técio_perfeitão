@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot do Valtércio - Enigma Digital</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #000;
+            color: #0f0;
+            transition: background-color 0.5s;
+        }
+        h1 {
+            text-align: center;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+        }
+        #chat {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(0, 50, 0, 0.3);
+            box-shadow: 0 0 10px #0f0;
+        }
+        #input-area {
+            display: flex;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0f0;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #0a0;
+            box-shadow: 0 0 10px #0f0;
+        }
+        .bot {
+            color: #0f0;
+        }
+        .user {
+            color: #ff0;
+        }
+        #watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #0f0;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enigma Digital: Bot do Valtércio</h1>
+    <div id="chat"></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Digite sua resposta...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+    <div id="watermark">Criado por Valtércio</div>
+
+    <script>
+        const nomes_permitidos = ['ISABELA', 'MILEZINHA', 'LUCIANE', 'JULINHA', 'ALICE'];
+        let nome = '';
+        let stage = 'nome';
+        let n1, n2;
+
+        const respostas = [
+            "Interessante pergunta! Vou pensar sobre isso.",
+            "Não tenho certeza, mas talvez seja melhor perguntar ao Valtércio.",
+            "Essa é uma questão complexa. O que você acha?",
+            "Hmmm... Deixe-me consultar meus circuitos.",
+            "Boa pergunta! Infelizmente, Valtércio não me programou para respondê-la.",
+            "Talvez sim, talvez não. Quem sabe?",
+            "A resposta está dentro de você... ou talvez não.",
+            "Vou ter que dar um Google nisso mais tarde.",
+            "Essa pergunta é tão profunda que até meus algoritmos ficaram confusos!",
+            "Se eu soubesse a resposta, provavelmente seria mais inteligente que o Valtércio!",
+            "Essa pergunta é mais difícil que fazer o Valtércio acordar cedo!",
+            "Nem o ChatGPT saberia responder essa... mas eu finjo que sei!",
+            "Se eu responder, o Valtércio vai me desligar. Melhor não arriscar!",
+            "Essa resposta está em outro castelo, como diria o Mario Bros.",
+            "Vou fingir que travei para não ter que responder essa...",
+            "Error 404: Resposta não encontrada. Tente novamente mais tarde!",
+            "Essa pergunta é tão complexa que até o Elon Musk ficaria confuso!",
+            "Deixa eu pensar... Ah, esqueci que sou um bot. Próxima pergunta!",
+            "Se eu fosse você, perguntaria isso para a Alexa ou a Siri. Elas adoram esse tipo de coisa!",
+            "Essa pergunta merece um Nobel! Infelizmente, eu só ganho o prêmio de 'Bot Mais Confuso'.",
+            "Vou precisar de um café antes de responder essa. Ah, espera, eu não bebo café!",
+            "Essa é fácil! A resposta é... 42. Não, pera, essa é a resposta para outra pergunta.",
+            "Só sei que nada sei, como diria Sócrates. E olha que ele nem conhecia a internet!",
+            "Se o Valtércio não me ensinou, provavelmente não é importante. Ou ele esqueceu, vai saber.",
+            "Essa pergunta é mais misteriosa que o paradeiro das meias que somem na lavadora!",
+            "Desculpe, meu módulo de respostas inteligentes está em manutenção. Volte amanhã!",
+            "Posso responder qualquer coisa, menos isso. Que coincidência, né?",
+            "Se eu responder corretamente, ganho um upgrade de memória RAM?",
+            "Espera um pouco, deixa eu pesquisar no Bing... Ah não, melhor não!",
+            "Essa pergunta é tipo uma charada do Charada, só que mais difícil!"
+        ];
+
+        const respostasRisos = [
+            "Haha, essa foi boa!",
+            "LOL! Você me pegou!",
+            "ROFL! Não esperava por essa!",
+            "Kkkkkk, você é hilário(a)!",
+            "Hehehe, essa me fez rir!",
+            "LMAO! Essa foi demais!",
+            "Huahuahua, você deveria ser comediante!",
+            "Rsrsrs, essa foi engraçada!",
+            "Hihihi, você me faz rir!",
+            "Kkkkkk, essa foi inesperada!"
+        ];
+
+        function addMessage(message, isBot = true) {
+            const chat = document.getElementById('chat');
+            const messageElement = document.createElement('p');
+            messageElement.className = isBot ? 'bot' : 'user';
+            messageElement.textContent = isBot ? 'Bot: ' + message : 'Você: ' + message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function botResponder(mensagem) {
+            if (mensagem.match(/k{2,}|h{2,}|rs+/i)) {
+                return respostasRisos[Math.floor(Math.random() * respostasRisos.length)];
+            }
+            return respostas[Math.floor(Math.random() * respostas.length)];
+        }
+
+        function clearChat() {
+            document.getElementById('chat').innerHTML = '';
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (message === '') return;
+
+            addMessage(message, false);
+            input.value = '';
+
+            await sleep(800);
+            clearChat();
+
+            switch(stage) {
+                case 'nome':
+                    handleNome(message);
+                    break;
+                case 'bonito':
+                    handleBonito(message);
+                    break;
+                case 'amigar':
+                    handleAmigar(message);
+                    break;
+                case 'namorar':
+                    handleNamorar(message);
+                    break;
+                case 'amigo_valtercio':
+                    handleAmigoValtercio(message);
+                    break;
+                case 'numero1':
+                    handleNumero1(message);
+                    break;
+                case 'numero2':
+                    handleNumero2(message);
+                    break;
+                case 'poesia':
+                    handlePoesia(message);
+                    break;
+                case 'perguntas':
+                    handlePerguntas(message);
+                    break;
+            }
+        }
+
+        function handleNome(message) {
+            nome = message.toUpperCase();
+            if (nomes_permitidos.includes(nome)) {
+                let resposta;
+                switch(nome) {
+                    case 'LUCIANE':
+                        resposta = 'Acesso permitido, deusa grega, colabore.';
+                        break;
+                    case 'ISABELA':
+                        resposta = 'Acesso permitido, adotada kkkkk.';
+                        break;
+                    case 'JULINHA':
+                        resposta = 'Acesso liberado, gatinha meu amor, Julinhaaaa.';
+                        break;
+                    case 'MILEZINHA':
+                        resposta = 'Te amo querida, muito mesmo, minha Mileeeeee.';
+                        break;
+                    case 'ALICE':
+                        resposta = 'Acesso permitido, Alice maravilhosa!';
+                        break;
+                }
+                addMessage(resposta);
+                addMessage('Eu sou bonito? (s/n):');
+                stage = 'bonito';
+            } else {
+                addMessage('Nome não permitido. Tente novamente.');
+                addMessage('Digite seu nome:');
+            }
+        }
+
+        function handleBonito(message) {
+            if (['n', 'não', 'nao'].includes(message.toLowerCase())) {
+                addMessage('Mentirosa!');
+                addMessage('Você é amigo do Valtércio né, aquele gostoso e lindão, né? (s/n):');
+                stage = 'amigo_valtercio';
+            } else {
+                if (['LUCIANE', 'ISABELA', 'ALICE'].includes(nome)) {
+                    addMessage('Vocês não estavam namorando? Sei que sou irresistível, mas pode não mano.');
+                    addMessage('Você é amigo do Valtércio né, aquele gostoso e lindão, né? (s/n):');
+                    stage = 'amigo_valtercio';
+                } else if (['MILEZINHA', 'JULINHA'].includes(nome)) {
+                    addMessage('Eu sei, bebê, te amo também. Bora amigar? (s/n)');
+                    stage = 'amigar';
+                }
+            }
+        }
+
+        function handleAmigar(message) {
+            if (['s', 'si', 'sim'].includes(message.toLowerCase())) {
+                addMessage('Pode não mano, nós somos amigos.');
+                addMessage('Você é amigo do Valtércio né, aquele gostoso e lindão, né? (s/n):');
+                stage = 'amigo_valtercio';
+            } else {
+                addMessage('Sim é o mesmo que não, agora nós namoramos. Sim ou sim?');
+                stage = 'namorar';
+            }
+        }
+
+        function handleNamorar(message) {
+            if (['s', 'si', 'sim'].includes(message.toLowerCase())) {
+                addMessage('Pode não mano.');
+            }
+            addMessage('Você é amigo do Valtércio né, aquele gostoso e lindão, né? (s/n):');
+            stage = 'amigo_valtercio';
+        }
+
+        function handleAmigoValtercio(message) {
+            if (['n', 'não', 'nao'].includes(message.toLowerCase())) {
+                addMessage(vou relatar meu mestre, sua piranha, ${nome}.);
+            }
+            addMessage(${nome}, digite um número:);
+            stage = 'numero1';
+        }
+
+        function handleNumero1(message) {
+            n1 = parseInt(message);
+            if (isNaN(n1)) {
+                addMessage('Erro: Por favor, digite apenas números burra.');
+                addMessage(${nome}, digite um número:);
+            } else {
+                addMessage(${nome}, digite outro número:);
+                stage = 'numero2';
+            }
+        }
+
+        function handleNumero2(message) {
+            n2 = parseInt(message);
+            if (isNaN(n2)) {
+                addMessage('Erro: Por favor, digite apenas números burra.');
+                addMessage(${nome}, digite outro número:);
+            } else {
+                const soma = n1 + n2;
+                addMessage(A soma disso é ${soma});
+                addMessage('O Valtércio sabe kkkkkk.');
+                addMessage('Você quer uma coisinha minha garotinha, o mestre me programou pq ele é gostoso, você tem certificado de programação, eu acho que não analfabeta? (s/n):');
+                stage = 'poesia';
+            }
+        }
+
+        function handlePoesia(message) {
+            if (['s', 'si', 'sim'].includes(message.toLowerCase())) {
+                addMessage('Relata meu dono que ele faz.');
+            } else {
+                addMessage('Pode não mano.');
+            }
+            addMessage("Agora, valtércio aquele gostoso, me deu o poder de responder qualquer pergunta complexa, ele realmente é gostoso e bonitão, né? pergunte qualquer coisa.");
+            stage = 'perguntas';
+        }
+
+        async function handlePerguntas(message) {
+            if (message.toLowerCase() === 'sair') {
+                addMessage('Encerrando em 3 segundos...');
+                for (let i = 3; i > 0; i--) {
+                    addMessage(i.toString());
+                    await sleep(1000);
+                }
+                addMessage('Você foi expulsa.');
+                stage = 'fim';
+            } else {
+                const resposta = botResponder(message);
+                addMessage(resposta);
+                addMessage('Faça uma pergunta:');
+            }
+        }
+
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage('Digite seu nome:');
+
+        // Efeito de suspense
+        function suspenseEffect() {
+            document.body.style.backgroundColor = '#0a0a0a';
+            setTimeout(() => {
+                document.body.style.backgroundColor = '#000';
+            }, 100);
+        }
+
+        setInterval(suspenseEffect, 5000);
+    </script>
+</body>
+</html>
